@@ -1,0 +1,12 @@
+1100.00
+bob1	S	1	1200.00
+cathie1	B	1000
+elon	S	1000	1100.00
+warren1	B	200	1000.00
+jeff1	S	300	900.00
+warren2	B	100	900.00
+bob2	B	1	700.00
+alice	S	2	700.00
+cathie2	S	1000
+jeff2	B	300
+warren3	B	700	700.00
