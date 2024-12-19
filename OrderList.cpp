@@ -153,14 +153,16 @@ void OrderList::displayPendingOrders_() const {
 			cout << left << setw(25) << buyLine << sellLine << endl;
 		}
 	}
-	cout << "\n\n";
+	cout << "\n";
 }
 
 void OrderList::outputTrade_(const Order& incoming, const Order& top, int tradedQuantity, double executionPrice) {
 	Order buy = incoming.type_ == 'B' ? incoming : top;
 	Order sell = incoming.type_ == 'S' ? incoming : top;
 	outputFile_ << "order " << buy.id_ << " " << tradedQuantity << " shares purchased at price " << fixed << setprecision(2) << executionPrice << endl;
+	cout << "order " << buy.id_ << " " << tradedQuantity << " shares purchased at price " << fixed << setprecision(2) << executionPrice << endl;
 	outputFile_ << "order " << sell.id_ << " " << tradedQuantity << " shares sold at price " << fixed << setprecision(2) << executionPrice << endl;
+	cout << "order " << sell.id_ << " " << tradedQuantity << " shares sold at price " << fixed << setprecision(2) << executionPrice << "\n\n";
 }
 
 void OrderList::outputUnmatchedOrders_() {
