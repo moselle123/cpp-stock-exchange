@@ -96,9 +96,9 @@ float OrderList::determineExecutionPrice(const Order& incoming, const Order& top
 	Order buy = incoming.type == 'B' ? incoming : top;
 	Order sell = incoming.type == 'S' ? incoming : top;
         if (!buy.isMarketOrder() && !sell.isMarketOrder()) {
-            return sell.timestamp < buy.timestamp ? sell.price : buy.price;
+            return sell.arrivalTime < buy.arrivalTime ? sell.limitPrice : buy.limitPrice;
         }
-        return buy.isMarketOrder() ? sell.price : buy.price;
+        return buy.isMarketOrder() ? sell.limitPrice : buy.limitPrice;
 }
 
 void OrderList::reinsertIncompatibleOrders(vector<Order> incompatibleOrders, priority_queue<Order>& queue) {
@@ -119,11 +119,11 @@ void OrderList::displayPendingOrders() const {
 }
 
 // void OrderList::recordTrade(const Order& buy, const Order& sell, int quantity, float price) {
-        std::ostringstream trade;
-        trade << "order " << buy.id << " " << quantity << " shares purchased at price "
-              << std::fixed << std::setprecision(2) << price << "\n";
-        trade << "order " << sell.id << " " << quantity << " shares sold at price "
-              << std::fixed << std::setprecision(2) << price << "\n";
-        executedOrders.push_back(trade.str());
-        lastTradedPrice = price;
-}
+//         std::ostringstream trade;
+//         trade << "order " << buy.id << " " << quantity << " shares purchased at price "
+//               << std::fixed << std::setprecision(2) << price << "\n";
+//         trade << "order " << sell.id << " " << quantity << " shares sold at price "
+//               << std::fixed << std::setprecision(2) << price << "\n";
+//         executedOrders.push_back(trade.str());
+//         lastTradedPrice = price;
+// }
