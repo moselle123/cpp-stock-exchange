@@ -1,0 +1,16 @@
+order cathie1 1 shares purchased at price 1200.00
+order bob1 1 shares sold at price 1200.00
+order cathie1 999 shares purchased at price 1100.00
+order elon 999 shares sold at price 1100.00
+order warren1 200 shares purchased at price 1000.00
+order jeff1 200 shares sold at price 1000.00
+order warren2 100 shares purchased at price 900.00
+order jeff1 100 shares sold at price 900.00
+order bob2 1 shares purchased at price 700.00
+order alice 1 shares sold at price 700.00
+order jeff2 300 shares purchased at price 700.00
+order cathie2 300 shares sold at price 700.00
+order warren3 700 shares purchased at price 700.00
+order cathie2 700 shares sold at price 700.00
+order elon 1 shares unexecuted
+order alice 1 shares unexecuted

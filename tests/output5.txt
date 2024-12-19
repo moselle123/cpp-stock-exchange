@@ -1,0 +1,4 @@
+order ord002 100 shares purchased at price 4.75
+order ord003 100 shares sold at price 4.75
+order ord001 100 shares unexecuted
+order ord004 100 shares unexecuted

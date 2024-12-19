@@ -1,0 +1,8 @@
+order ord002 50 shares purchased at price 4.75
+order ord001 50 shares sold at price 4.75
+order ord004 100 shares purchased at price 4.50
+order ord005 100 shares sold at price 4.50
+order ord003 50 shares purchased at price 4.25
+order ord005 50 shares sold at price 4.25
+order ord006 50 shares purchased at price 4.25
+order ord007 50 shares sold at price 4.25
