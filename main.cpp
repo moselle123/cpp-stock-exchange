@@ -9,20 +9,20 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	string inputFile = argv[1];
-	string outputFile = "output" + inputFile.substr(5);
+	string inputFileName = argv[1];
+	string outputFileName = string(inputFileName).replace(inputFileName.find("input"), 5, "output");
 
-	ifstream file(inputFile);
-	if (!file) {
-		cerr << "Error opening file: " << inputFile << endl;
+	ifstream inputFile(inputFileName);
+	if (!inputFile) {
+		cerr << "Error opening file: " << inputFileName << endl;
 		return 1;
 	}
 
 	double lastTradedPrice;
-	file >> lastTradedPrice;
+	inputFile >> lastTradedPrice;
 
 	OrderList orders(lastTradedPrice);
-	orders.processOrders(file, outputFile);
+	orders.processOrders(inputFile, outputFileName);
 
 	return 0;
 }
