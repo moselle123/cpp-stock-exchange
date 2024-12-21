@@ -2,6 +2,8 @@
 
 Order::Order(const string& id, char type, int qty, double price, int time) : id_(id), type_(type), quantity_(qty), limitPrice_(price), arrivalTime_(time) {}
 
+Order::~Order() {}
+
 bool Order::operator<(const Order& other) const {
 	if (type_ == 'B') {
 		if (isMarketOrder_() != other.isMarketOrder_()) {
@@ -26,6 +28,12 @@ bool Order::isMarketOrder_() const {
 }
 
 OrderList::OrderList(double lastPrice) : lastTradedPrice_(lastPrice) {}
+
+OrderList::~OrderList() {
+	if (outputFile_.is_open()) {
+		outputFile_.close();
+	}
+}
 
 void OrderList::processOrders(ifstream& inputFile, const string& outputFileName) {
 	outputFile_.open(outputFileName);

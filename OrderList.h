@@ -18,6 +18,7 @@ private:
 	bool isMarketOrder_() const;
 public:
 	Order(const std::string& id, char type, int qty, double price, int time);
+	~Order();
 	bool operator<(const Order& other) const;
 
 	friend class OrderList;
@@ -40,6 +41,7 @@ private:
 	void outputUnmatchedOrders_();
 public:
 	explicit OrderList(double lastPrice);
+	~OrderList();
 
 	void processOrders(ifstream& inputFile, const string& outputFile);
 };
