@@ -1,7 +1,4 @@
 #include "OrderList.h"
-#include <iostream>
-#include <iomanip>
-#include <algorithm>
 
 Order::Order(const string& id, char type, int qty, double price, int time) : id_(id), type_(type), quantity_(qty), limitPrice_(price), arrivalTime_(time) {}
 
@@ -47,13 +44,13 @@ void OrderList::processOrders(ifstream& inputFile, const string& outputFileName)
 		Order currentOrder = inputFile >> price ? Order(id, type, quantity, price, time++) : Order(id, type, quantity, -1, time++);
 		inputFile.clear();
 
+		displayPendingOrders_(currentOrder);
+
 		if (type == 'B') {
 			matchOrder_(currentOrder, sellOrders_, buyOrders_);
 		} else {
 			matchOrder_(currentOrder, buyOrders_, sellOrders_);
 		}
-
-		displayPendingOrders_();
 	}
 	outputUnmatchedOrders_();
 }
@@ -67,7 +64,10 @@ void OrderList::matchOrder_(Order incoming, priority_queue<Order>& potentialMatc
 		while (!potentialMatches.empty() && !matchFound) {
 			Order topOrder = potentialMatches.top();
 
-			if (!isMatch_(incoming, topOrder)) {
+			Order buy = (incoming.type_ == 'B') ? incoming : topOrder;
+            		Order sell = (incoming.type_ == 'S') ? incoming : topOrder;
+
+			if (!isMatch_(buy, sell)) {
 				incompatibleOrders.push_back(topOrder);
 				potentialMatches.pop();
 				continue;
@@ -75,9 +75,9 @@ void OrderList::matchOrder_(Order incoming, priority_queue<Order>& potentialMatc
 
 			matchFound = true;
 			int tradedQuantity = min(incoming.quantity_, topOrder.quantity_);
-			lastTradedPrice_ = getExecutionPrice_(incoming, topOrder);
+			lastTradedPrice_ = getExecutionPrice_(buy, sell);
 
-			outputTrade_(incoming, topOrder, tradedQuantity, lastTradedPrice_);
+			outputTrade_(buy, sell, tradedQuantity, lastTradedPrice_);
 			incoming.quantity_ -= tradedQuantity;
 			topOrder.quantity_ -= tradedQuantity;
 
@@ -98,12 +98,9 @@ void OrderList::matchOrder_(Order incoming, priority_queue<Order>& potentialMatc
 	}
 }
 
-float OrderList::getExecutionPrice_(const Order& incoming, const Order& top) const {
-	Order buy = incoming.type_ == 'B' ? incoming : top;
-	Order sell = incoming.type_ == 'S' ? incoming : top;
-
+float OrderList::getExecutionPrice_(const Order& buy, const Order& sell) const {
 	if (!buy.isMarketOrder_() && !sell.isMarketOrder_()) {
-		return sell.arrivalTime_ < buy.arrivalTime_ ? sell.limitPrice_ : buy.limitPrice_;
+		return (sell.arrivalTime_ < buy.arrivalTime_) ? sell.limitPrice_ : buy.limitPrice_;
 	} else if (buy.isMarketOrder_() && sell.isMarketOrder_()) {
 		return lastTradedPrice_;
 	}
@@ -116,52 +113,72 @@ void OrderList::reinsertIncompatibleOrders_(vector<Order> incompatibleOrders, pr
 	}
 }
 
-bool OrderList::isMatch_(Order incoming, Order top) const {
-	Order buy = incoming.type_ == 'B' ? incoming : top;
-	Order sell = incoming.type_ == 'S' ? incoming : top;
+bool OrderList::isMatch_(const Order& buy, const Order& sell) const  {
 	return buy.isMarketOrder_() || sell.isMarketOrder_() || buy.limitPrice_ >= sell.limitPrice_;
 }
 
-void OrderList::displayPendingOrders_() const {
+void OrderList::displayPendingOrders_(const Order& incoming) const {
 	cout << "Last trading price: " << lastTradedPrice_ << endl;
-	if (buyOrders_.empty() && sellOrders_.empty()) {
-		cout << "No Pending Orders" << endl;
-	} else {
-		cout << fixed << setprecision(2);
+	cout << "Buy                        Sell" << endl;
+	cout << "------------------------------------------------" << endl;
 
-		cout << "Buy                       Sell" << endl;
-		cout << "------------------------------------------" << endl;
+	vector<Order> buyOrdersReversed;
+	vector<Order> sellOrdersReversed;
 
-		auto buyQueueCopy = buyOrders_;
-		auto sellQueueCopy = sellOrders_;
+	incoming.type_ == 'B' ? buyOrdersReversed.push_back(incoming) : sellOrdersReversed.push_back(incoming);
 
-		while (!buyQueueCopy.empty() || !sellQueueCopy.empty()) {
-			string buyLine = "";
-			string sellLine = "";
+	auto buyQueueCopy = buyOrders_;
+	while (!buyQueueCopy.empty()) {
+		buyOrdersReversed.push_back(buyQueueCopy.top());
+		buyQueueCopy.pop();
+	}
 
-			if (!buyQueueCopy.empty()) {
-				const Order& topBuy = buyQueueCopy.top();
-				buyLine = topBuy.id_ + " " + (topBuy.isMarketOrder_() ? "M" : to_string(topBuy.limitPrice_)) + " " + to_string(topBuy.quantity_);
-				buyQueueCopy.pop();
+	auto sellQueueCopy = sellOrders_;
+	while (!sellQueueCopy.empty()) {
+		sellOrdersReversed.push_back(sellQueueCopy.top());
+		sellQueueCopy.pop();
+	}
+
+	while (!buyOrdersReversed.empty() || !sellOrdersReversed.empty()) {
+		if (!buyOrdersReversed.empty()) {
+			const Order& buy = buyOrdersReversed.back();
+			cout << left << setw(9) << buy.id_;
+			if (buy.isMarketOrder_()) {
+				cout << setw(8) << "M";
+			} else {
+				cout << setw(8) << fixed << setprecision(2) << buy.limitPrice_;
 			}
-
-			if (!sellQueueCopy.empty()) {
-				const Order& topSell = sellQueueCopy.top();
-				sellLine = topSell.id_ + " " + (topSell.isMarketOrder_() ? "M" : to_string(topSell.limitPrice_)) + " " + to_string(topSell.quantity_);
-				sellQueueCopy.pop();
-			}
-			cout << left << setw(25) << buyLine << sellLine << endl;
+			cout << setw(5) << buy.quantity_ << setw(5) << "";;
+			buyOrdersReversed.pop_back();
+		} else {
+			cout << left << setw(27) << "";
 		}
+
+		if (!sellOrdersReversed.empty()) {
+			const Order& sell = sellOrdersReversed.back();
+			cout << left << setw(9) << sell.id_;
+			if (sell.isMarketOrder_()) {
+				cout << setw(8) << "M";
+			} else {
+				cout << setw(8) << fixed << setprecision(2) << sell.limitPrice_;
+			}
+			cout << setw(5) << sell.quantity_;
+			sellOrdersReversed.pop_back();
+		}
+		cout << endl;
 	}
 	cout << "\n";
 }
 
-void OrderList::outputTrade_(const Order& incoming, const Order& top, int tradedQuantity, double executionPrice) {
-	Order buy = incoming.type_ == 'B' ? incoming : top;
-	Order sell = incoming.type_ == 'S' ? incoming : top;
+void OrderList::outputTrade_(const Order& buy, const Order& sell, int tradedQuantity, double executionPrice) {
+	if (firstLine) {
+		firstLine = false;
+	} else {
+		outputFile_ << "\n";
+	}
 	outputFile_ << "order " << buy.id_ << " " << tradedQuantity << " shares purchased at price " << fixed << setprecision(2) << executionPrice << endl;
 	cout << "order " << buy.id_ << " " << tradedQuantity << " shares purchased at price " << fixed << setprecision(2) << executionPrice << endl;
-	outputFile_ << "order " << sell.id_ << " " << tradedQuantity << " shares sold at price " << fixed << setprecision(2) << executionPrice << endl;
+	outputFile_ << "order " << sell.id_ << " " << tradedQuantity << " shares sold at price " << fixed << setprecision(2) << executionPrice;
 	cout << "order " << sell.id_ << " " << tradedQuantity << " shares sold at price " << fixed << setprecision(2) << executionPrice << "\n\n";
 }
 
@@ -185,6 +202,6 @@ void OrderList::outputUnmatchedOrders_() {
 	});
 
 	for (const auto& order : unmatchedOrders) {
-		outputFile_ << "order " << order.id_ << " " << order.quantity_ << " shares unexecuted" << endl;
+		outputFile_ << endl << "order " << order.id_ << " " << order.quantity_ << " shares unexecuted";
 	}
 }
