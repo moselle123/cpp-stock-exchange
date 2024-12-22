@@ -42,6 +42,8 @@ void OrderList::processOrders(ifstream& inputFile, const string& outputFileName)
 		return;
 	}
 
+	outputFile_ << fixed << setprecision(2);
+
 	string id;
 	char type;
 	int quantity;
@@ -154,7 +156,7 @@ void OrderList::displayPendingOrders_(const Order& incoming) const {
 			if (buy.isMarketOrder_()) {
 				cout << setw(8) << "M";
 			} else {
-				cout << setw(8) << fixed << setprecision(2) << buy.limitPrice_;
+				cout << setw(8) << buy.limitPrice_;
 			}
 			cout << setw(5) << buy.quantity_ << setw(5) << "";;
 			buyOrdersReversed.pop_back();
@@ -168,7 +170,7 @@ void OrderList::displayPendingOrders_(const Order& incoming) const {
 			if (sell.isMarketOrder_()) {
 				cout << setw(8) << "M";
 			} else {
-				cout << setw(8) << fixed << setprecision(2) << sell.limitPrice_;
+				cout << setw(8) << sell.limitPrice_;
 			}
 			cout << setw(5) << sell.quantity_;
 			sellOrdersReversed.pop_back();
@@ -184,10 +186,10 @@ void OrderList::outputTrade_(const Order& buy, const Order& sell, int tradedQuan
 	} else {
 		outputFile_ << "\n";
 	}
-	outputFile_ << "order " << buy.id_ << " " << tradedQuantity << " shares purchased at price " << fixed << setprecision(2) << executionPrice << endl;
-	cout << "order " << buy.id_ << " " << tradedQuantity << " shares purchased at price " << fixed << setprecision(2) << executionPrice << endl;
-	outputFile_ << "order " << sell.id_ << " " << tradedQuantity << " shares sold at price " << fixed << setprecision(2) << executionPrice;
-	cout << "order " << sell.id_ << " " << tradedQuantity << " shares sold at price " << fixed << setprecision(2) << executionPrice << "\n\n";
+	outputFile_ << "order " << buy.id_ << " " << tradedQuantity << " shares purchased at price " << executionPrice << endl;
+	cout << "order " << buy.id_ << " " << tradedQuantity << " shares purchased at price " << executionPrice << endl;
+	outputFile_ << "order " << sell.id_ << " " << tradedQuantity << " shares sold at price " << executionPrice;
+	cout << "order " << sell.id_ << " " << tradedQuantity << " shares sold at price " << executionPrice << "\n\n";
 }
 
 void OrderList::outputUnmatchedOrders_() {
