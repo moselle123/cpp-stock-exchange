@@ -73,7 +73,7 @@ void OrderList::matchOrder_(Order incoming, priority_queue<Order>& potentialMatc
 			Order topOrder = potentialMatches.top();
 
 			Order buy = (incoming.type_ == 'B') ? incoming : topOrder;
-            		Order sell = (incoming.type_ == 'S') ? incoming : topOrder;
+			Order sell = (incoming.type_ == 'S') ? incoming : topOrder;
 
 			if (!isMatch_(buy, sell)) {
 				incompatibleOrders.push_back(topOrder);
