@@ -4,14 +4,14 @@ CXXFLAGS = -O0 -g3 -std=c++17 -Wall -Wextra -pedantic
 
 all: main
 
-main: main.cpp orderlist.o
-	$(CXX) $(CXXFLAGS) main.cpp orderlist.o -o main
+main: main.cpp OrderList.o
+	$(CXX) $(CXXFLAGS) main.cpp OrderList.o -o main
 
-orderlist.o: orderlist.cpp orderlist.h
-	$(CXX) $(CXXFLAGS) -c orderlist.cpp -o orderlist.o
+OrderList.o: OrderList.cpp OrderList.h
+	$(CXX) $(CXXFLAGS) -c OrderList.cpp -o OrderList.o
 
-clean:
+deepclean:
 	rm -f *~ *.o main main.exe *.stackdump
 
-deepclean: clean
-	rm -f *.stackdump
+clean: clean
+	rm -f *~ *.o *.stackdump
